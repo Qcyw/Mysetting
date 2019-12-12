@@ -1,0 +1,1 @@
+This repository is to keep a record of my vim setting just in case.
