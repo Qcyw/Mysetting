@@ -1,22 +1,28 @@
-
-" ============================================================================
-" Vim-plug initialization
-" Avoid modify this section, unless you are very sure of what you are doing
-
+"========================================================================
+" "Vim-plug initialization
+" "Avoid modify this section, unless you are very sure of what you are doing
+  "
 set nocompatible              " be iMproved, required
 filetype off                  " required
-
-" set the runtime path to include Vundle and initialize
+set shell=/bin/bash
+" "set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-
+  "
 Plugin 'xuhdev/vim-latex-live-preview'
-" alternatively, pass a path where Vundle should install plugins
+"  alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
+
+Plugin 'git@github.com:kien/ctrlp.vim.git'
+"Plugin 'jremmen/vim-ripgrep'
+Plugin 'lyuts/vim-rtags'
+
+Plugin 'mbbill/undotree'
+Plugin 'mileszs/ack.vim'
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
-
+Plugin 'KeitaNakamura/tex-conceal.vim'
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
 " plugin on GitHub repo
@@ -26,7 +32,6 @@ Plugin 'tpope/vim-fugitive'
 " Git plugin not hosted on GitHub
 Plugin 'git://git.wincent.com/command-t.git'
 " git repos on your local machine (i.e. when working on your own plugin)
-Plugin 'file:///home/gmarik/path/to/plugin'
 " The sparkup vim script is in a subdirectory of this repo called vim.
 " Pass the path to set the runtimepath properly.
 Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
@@ -34,7 +39,19 @@ Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 " different version somewhere else.
 " Plugin 'ascenator/L9', {'name': 'newL9'}
 Plugin 'scrooloose/nerdtree'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
 " All of your Plugins must be added before the following line
+Plugin 'Valloric/YouCompleteMe'
+
+Plugin 'artur-shaik/vim-javacomplete2'
+    autocmd FileType java setlocal omnifunc=javacomplete#Complete
+
+" Use release branch (Recommend)
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plugin 'junegunn/fzf.vim'
+
 call vundle#end()            " required
 
 
@@ -52,11 +69,64 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 
+if executable('rg')
+    let g:rg_derive_root='true'
+endif
+
+let mapleader = " "
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+
+let g:netrw_browse_split = 2
+let g:netrw_banner = 0
+let g:netrw_winsize = 25
+
+nnoremap <leader>h :wincmd h<CR>
+nnoremap <leader>j :wincmd j<CR>
+nnoremap <leader>k :wincmd k<CR>
+nnoremap <leader>l :wincmd l<CR>
+nnoremap <leader>pv :wincmd v<bar> :Ex <bar> :vertical resize 30<CR>
+nnoremap <Leader>ps :Rg<space>
+nnoremap <silent> <Leader>+ :vertical resize +5<CR>
+nnoremap <silent> <Leader>- :vertical resize -5<CR>
+" nnoremap <leader>f :CtrlP <CR>
+nnoremap <leader>u :UndotreeShow <CR>
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
 
 
+nnoremap <buffer> <silent> <leader>gd :YcmCompleter GoTo<CR>
+nnoremap <buffer> <silent> <leader>gr :YcmCompleter GoToReferences<CR>
+nnoremap <buffer> <silent> <leader>rr :YcmCompleter RefactorRename<space>
+
+nnoremap <silent> <leader>f :Files<CR>
 
 
+" coc config
+let g:coc_global_extensions = [
+  \ 'coc-snippets',
+  \ 'coc-pairs',
+  \ 'coc-tsserver',
+  \ 'coc-eslint',
+  \ 'coc-prettier',
+  \ 'coc-json',
+  \ ]
 
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip
+let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+
+
+if has('folding')
+  if has('windows')
+    let &fillchars='vert: '           " less cluttered vertical window separators
+  endif
+  set foldmethod=indent               " not as cool as syntax, but faster
+  set foldlevelstart=99               " start unfolded
+endif
 
 
 let vim_plug_just_installed = 0
@@ -86,10 +156,9 @@ call plug#begin('~/.vim/plugged')
 
 " Plugins from github repos:
 
-" Override configs by directory 
+" Override configs by directory
+
 Plug 'arielrossanigo/dir-configs-override.vim'
-" Better file browser
-Plug 'scrooloose/nerdtree'
 " Code commenter
 Plug 'scrooloose/nerdcommenter'
 " Class/module browser
@@ -121,14 +190,12 @@ Plug 'Townk/vim-autoclose'
 Plug 'michaeljsmith/vim-indent-object'
 " Indentation based movements
 Plug 'jeetsukumaran/vim-indentwise'
-" Python autocompletion, go to definition.
-Plug 'davidhalter/jedi-vim'
 " Better autocompletion
 Plug 'Shougo/neocomplcache.vim'
 " Snippets manager (SnipMate), dependencies, and snippets repo
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
-Plug 'honza/vim-snippets'
+
 Plug 'garbas/vim-snipmate'
 " Git/mercurial/others diff icons on the side of the file lines
 Plug 'mhinz/vim-signify'
@@ -150,8 +217,8 @@ if has('python')
 endif
 " Relative numbering of lines (0 is the current line)
 " (disabled by default because is very intrusive and can't be easily toggled
-" on/off. When the plugin is present, will always activate the relative 
-" numbering every time you go to normal mode. Author refuses to add a setting 
+" on/off. When the plugin is present, will always activate the relative
+" numbering every time you go to normal mode. Author refuses to add a setting
 " to avoid that)
 " Plug 'myusuf3/numbers.vim'
 
@@ -201,38 +268,26 @@ autocmd FileType javascript setlocal shiftwidth=4 tabstop=4 softtabstop=4
 
 " always show status bar
 set ls=2
-
 " incremental search
 set incsearch
 " highlighted search results
 set hlsearch
-
 " syntax highlight on
 syntax on
-
 " show line numbers
 set nu
 
-" tab navigation mappings
+"tab navigation mappings
 map tn :tabn<CR>
 map tp :tabp<CR>
-map tm :tabm 
-map tt :tabnew 
+map tm :tabm
+map tt :tabnew <CR>
 map ts :tab split<CR>
 map <C-S-Right> :tabn<CR>
 imap <C-S-Right> <ESC>:tabn<CR>
 map <C-S-Left> :tabp<CR>
 imap <C-S-Left> <ESC>:tabp<CR>
 
-" navigate windows with meta+arrows
-map <M-Right> <c-w>l
-map <M-Left> <c-w>h
-map <M-Up> <c-w>k
-map <M-Down> <c-w>j
-imap <M-Right> <ESC><c-w>l
-imap <M-Left> <ESC><c-w>h
-imap <M-Up> <ESC><c-w>k
-imap <M-Down> <ESC><c-w>j
 
 " old autocomplete keyboard shortcut
 imap <C-J> <C-X><C-O>
@@ -246,7 +301,7 @@ set completeopt-=preview
 ca w!! w !sudo tee "%"
 
 " simple recursive grep
-nmap ,r :Ack 
+nmap ,r :Ack
 nmap ,wr :Ack <cword><CR>
 
 " use 256 colors when possible
@@ -268,7 +323,16 @@ set scrolloff=3
 " autocompletion of files and commands behaves like shell
 " (complete only the common part, list the options that match)
 set wildmode=list:longest
+let g:fzf_action = {
+  \ 'ctrl-f': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
 
+set columns=80
+autocmd VimResized * if (&columns > 80) | set columns=80 | endif
+set wrap
+set linebreak
+set showbreak=+++
 " better backup, swap and undos storage
 set directory=~/.vim/dirs/tmp     " directory to place swap files in
 set backup                        " make backup files
@@ -294,15 +358,15 @@ endif
 " Plugins settings and mappings
 " Edit them as you wish.
 
-" Tagbar ----------------------------- 
+" Tagbar -----------------------------
 
 " toggle tagbar display
 map <F4> :TagbarToggle<CR>
 " autofocus on tagbar open
 let g:tagbar_autofocus = 1
 
-" NERDTree ----------------------------- 
-
+" NERDTree -----------------------------
+nnoremap <leader>n :NERDTreeToggle<CR>
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -355,7 +419,7 @@ nmap <leader>e :Errors<CR>
 let g:syntastic_check_on_open = 1
 " don't put icons on the sign column (it hides the vcs status icons of signify)
 let g:syntastic_enable_signs = 0
-" custom icons (enable them if you use a patched font, and enable the previous 
+" custom icons (enable them if you use a patched font, and enable the previous
 " setting)
 "let g:syntastic_error_symbol = '✗'
 "let g:syntastic_warning_symbol = '⚠'
@@ -438,23 +502,9 @@ let g:airline#extensions#whitespace#enabled = 0
 "let g:airline_symbols.readonly = '⭤'
 "let g:airline_symbols.linenr = '⭡'
 
-
-
-
-
-
-
-
-
-" Track the engine.
-Plugin 'SirVer/ultisnips'
-
-" Snippets are separated from the engine. Add this if you want them:
-Plugin 'honza/vim-snippets'
-
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " If you want :UltiSnipsEdit to split your window.
@@ -466,20 +516,53 @@ let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
 
+setlocal spell
+set spelllang=en_us
+inoremap <C-l> <c-g>u<Esc>[s1z=`]a<c-g>u
+
+autocmd FileType vimtex Bundle 'Valloric/YouCompleteMe'
+set listchars=tab:▸\ ,trail:·,precedes:←,extends:→
 
 
+let g:fzf_layout = {'up':'~70%', 'window': { 'width': 0.8, 'height': 0.8,'yoffset':0.5,'xoffset': 0.5, 'highlight': 'Todo', 'border': 'sharp'  } }
+let $FZF_DEFAULT_OPTS = '--layout=reverse --info=inline'
+let $FZF_DEFAULT_COMMAND = 'rg --files --hidden'
+
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
 
 
+let g:fzf_colors =
+  \ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
 
+let g:fzf_tags_command='ctags -R'
 
+"Get Files
+command! -bang -nargs=? -complete=dir Files
+            \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--info=inline']}), <bang>0)
 
+" Get text in files with Rg
 
+function! RipgrepFzf(query, fullscreen)
+    let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
+    let initial_command = printf(command_fmt, shellescape(a:query))
+    let reload_command = printf(command_fmt, '{q}')
+    let options = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+    call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(options), a:fullscreen)
+endfunction
 
-
-
-
-
-
-
-
-
+command! -nargs=* -bang RF call RipgrepFzf(<q-args>, <bang>0)
